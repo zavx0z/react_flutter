@@ -1,8 +1,5 @@
 import {useEffect, useRef, useState} from "react"
 
-const useFlutter = () => {
-
-}
 const App = () => {
     const flutterTarget = useRef(null)
     const flutterState = useRef(null)
@@ -35,31 +32,28 @@ const App = () => {
             console.log("onTextChanged()")
         })
     }
-    return <div>
-
-        <h1>{count}</h1>
-        <button onClick={() => flutterState.current.setClicks(count + 1)}>+</button>
-        <div
-            style={{
-                width: '100%',
-                height: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <div
-                ref={flutterTarget}
-                style={{
-                    width: 444,
-                    height: 444,
-                    border: "1px solid black",
-                }}
-                id="App"
-            />
-
+    return <div
+        style={{
+            width: '100%',
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+        }}
+    >
+        <div>
+            <h1>{count}</h1>
+            <button onClick={() => flutterState.current.setClicks(count + 1)}>+</button>
         </div>
+        <div
+            ref={flutterTarget}
+            style={{
+                width: 444,
+                height: 444,
+                border: "1px solid black",
+            }}
+        />
     </div>
 }
 

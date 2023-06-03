@@ -3,10 +3,28 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
+import {createBrowserRouter, RouterProvider} from "react-router-dom"
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
-    <App/>
+    <RouterProvider router={createBrowserRouter([
+        {
+            path: "/",
+            loader: () => {
+                console.log('root')
+                return true
+            },
+            element: <App/>,
+        },
+        {
+            path: "/counter",
+            loader: () => {
+                console.log('counter')
+                return true
+            },
+            element: <App/>
+        }
+    ])}/>
 )
 
 // If you want to start measuring performance in your app, pass a function
