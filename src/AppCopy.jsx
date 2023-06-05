@@ -1,12 +1,12 @@
 import {useRef, useState} from "react"
 import useFlutter from "./hooks/useFlutter"
 
-const App = ({entrypointUrl, assetBase, baseUri}) => {
+const AppCopy = ({entrypointUrl, assetBase,baseUri}) => {
     const flutterTarget = useRef(null)
     const flutterState = useRef(null)
     const [count, setCount] = useState(0)
     useFlutter({
-        entrypointUrl, baseUri,
+        entrypointUrl,baseUri,
         onEntrypointLoaded: async (engineInitializer) => {
             let appRunner = await engineInitializer.initializeEngine({
                 hostElement: flutterTarget.current,
@@ -53,4 +53,4 @@ const App = ({entrypointUrl, assetBase, baseUri}) => {
     </div>
 }
 
-export default App
+export default AppCopy
