@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 
 import 'pages/counter.dart';
-import 'pages/dash.dart';
-import 'pages/text.dart';
 
 import 'src/js_interop.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -23,9 +21,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final ValueNotifier<int> _counter = ValueNotifier<int>(0);
-  final ValueNotifier<DemoScreen> _screen = ValueNotifier<DemoScreen>(DemoScreen.counter);
   late final AppStateManager _state;
-  final ValueNotifier<String> _text = ValueNotifier<String>('');
 
   @override
   void dispose() {
@@ -35,26 +31,11 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _state = AppStateManager(
-      screen: _screen,
-      counter: _counter,
-      text: _text,
-    );
+    _state = AppStateManager( counter: _counter );
     final export = createDartExport(_state);
 
     // Выпустите это через корневой объект приложения Flutter :)
     broadcastAppEvent('flutter-initialized', export);
-  }
-
-  Widget demoScreenRouter(DemoScreen which) {
-    switch (which) {
-      case DemoScreen.counter:
-        return CounterDemo(counter: _counter);
-      case DemoScreen.text:
-        return TextFieldDemo(text: _text);
-      case DemoScreen.dash:
-        return DashDemo(text: _text);
-    }
   }
 
   @override
@@ -65,10 +46,9 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: ValueListenableBuilder<DemoScreen>(
-        valueListenable: _screen,
-        builder: (context, value, child) => demoScreenRouter(value),
-      ),
+      routes: {
+        '/': (context) => CounterDemo(counter: _counter),
+      },
     );
   }
 }
