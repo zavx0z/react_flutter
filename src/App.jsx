@@ -1,27 +1,29 @@
-import {useEffect, useRef, useState} from "react"
+import {useRef, useState} from "react"
+import useFlutter from "./hooks/useFlutter"
 
 const App = ({entrypointUrl, assetBase}) => {
     const flutterTarget = useRef(null)
     const flutterState = useRef(null)
     const [count, setCount] = useState(0)
-    useEffect(() => {
-        if (window._flutter) {
-            window._flutter.loader.loadEntrypoint({
-                entrypointUrl: entrypointUrl,
-                onEntrypointLoaded: async (engineInitializer) => {
-                    let appRunner = await engineInitializer.initializeEngine({
-                        hostElement: flutterTarget.current,
-                        assetBase: assetBase,
-                    })
-                    await appRunner.runApp()
-                },
+    useFlutter({
+        entrypointUrl: entrypointUrl,
+        onEntrypointLoaded: async (engineInitializer) => {
+            let appRunner = await engineInitializer.initializeEngine({
+                hostElement: flutterTarget.current,
+                assetBase: assetBase,
             })
-            flutterTarget.current.addEventListener("flutter-initialized", (event) => {
-                onFlutterAppLoaded(event)
-            })
-            console.log(flutterTarget)
-        }
-    }, [assetBase, entrypointUrl])
+            await appRunner.runApp()
+        },
+        baseUri: '/',
+    })
+    // useEffect(() => {
+    //     if (window._flutter) {
+    //         flutterTarget.current.addEventListener("flutter-initialized", (event) => {
+    //             onFlutterAppLoaded(event)
+    //         })
+    //         console.log(flutterTarget)
+    //     }
+    // }, [assetBase, entrypointUrl])
     const onFlutterAppLoaded = (event) => {
         flutterState.current = event.detail
         setCount(flutterState.current.getClicks())
