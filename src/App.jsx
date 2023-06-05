@@ -1,17 +1,17 @@
 import {useEffect, useRef, useState} from "react"
 
-const App = () => {
+const App = ({entrypointUrl, assetBase}) => {
     const flutterTarget = useRef(null)
     const flutterState = useRef(null)
     const [count, setCount] = useState(0)
     useEffect(() => {
         if (window._flutter) {
             window._flutter.loader.loadEntrypoint({
-                entrypointUrl: "/flutter/main.dart.js",
+                entrypointUrl: entrypointUrl,
                 onEntrypointLoaded: async (engineInitializer) => {
                     let appRunner = await engineInitializer.initializeEngine({
                         hostElement: flutterTarget.current,
-                        assetBase: "/flutter/",
+                        assetBase: assetBase,
                     })
                     await appRunner.runApp()
                 },
@@ -21,16 +21,11 @@ const App = () => {
             })
             console.log(flutterTarget)
         }
-    }, [window._flutter])
+    }, [assetBase, entrypointUrl])
     const onFlutterAppLoaded = (event) => {
         flutterState.current = event.detail
-
         setCount(flutterState.current.getClicks())
-
         flutterState.current.onClicksChanged(() => setCount(flutterState.current.getClicks()))
-        flutterState.current.onTextChanged(() => {
-            console.log("onTextChanged()")
-        })
     }
     return <div
         style={{
