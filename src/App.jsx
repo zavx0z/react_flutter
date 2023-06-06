@@ -28,6 +28,7 @@ const App = ({ appDir, baseUri }) => {
       <div
         ref={flutterTarget}
         style={{
+          ...{visibility: flutterState? "visible" : "hidden"},
           width: 444,
           height: 444,
           border: "1px solid black",
