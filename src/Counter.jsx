@@ -1,4 +1,4 @@
-import { FlutterApp } from "./flutterApp/FlutterApp"
+import { FlutterApp } from "./FlutterApp"
 import { observer } from "mobx-react"
 import { applyPatch, addMiddleware, types } from "mobx-state-tree"
 
