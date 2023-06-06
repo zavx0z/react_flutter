@@ -1,56 +1,40 @@
-import {useRef, useState} from "react"
+import { useEffect, useState } from "react"
 import useFlutter from "./hooks/useFlutter"
 
-const App = ({entrypointUrl, assetBase, baseUri}) => {
-    const flutterTarget = useRef(null)
-    const flutterState = useRef(null)
-    const [count, setCount] = useState(0)
-    useFlutter({
-        entrypointUrl, baseUri,
-        onEntrypointLoaded: async (engineInitializer) => {
-            let appRunner = await engineInitializer.initializeEngine({
-                hostElement: flutterTarget.current,
-                assetBase: assetBase,
-            })
-            await appRunner.runApp()
-        },
-    })
-    // useEffect(() => {
-    //     if (window._flutter) {
-    //         flutterTarget.current.addEventListener("flutter-initialized", (event) => {
-    //             onFlutterAppLoaded(event)
-    //         })
-    //         console.log(flutterTarget)
-    //     }
-    // }, [assetBase, entrypointUrl])
-    const onFlutterAppLoaded = (event) => {
-        flutterState.current = event.detail
-        setCount(flutterState.current.getClicks())
-        flutterState.current.onClicksChanged(() => setCount(flutterState.current.getClicks()))
+const App = ({ assetBase, baseUri }) => {
+  const [count, setCount] = useState(0)
+  const { flutterTarget, flutterState } = useFlutter({ baseUri, assetBase })
+  useEffect(() => {
+    if (flutterState) {
+      setCount(flutterState.getClicks())
+      flutterState.onClicksChanged(() => setCount(flutterState.getClicks()))
     }
-    return <div
-        style={{
-            width: '100%',
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-        }}
+  }, [flutterState])
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-around",
+        alignItems: "center",
+      }}
     >
-        <div>
-            <h1>{count}</h1>
-            <button onClick={() => flutterState.current.setClicks(count + 1)}>+</button>
-        </div>
-        <div
-            ref={flutterTarget}
-            style={{
-                width: 444,
-                height: 444,
-                border: "1px solid black",
-            }}
-        />
+      <div>
+        <h1>{count}</h1>
+        <button onClick={() => flutterState.setClicks(count + 1)}>+</button>
+      </div>
+      <div
+        ref={flutterTarget}
+        style={{
+          width: 444,
+          height: 444,
+          border: "1px solid black",
+        }}
+      />
     </div>
+  )
 }
 
 export default App

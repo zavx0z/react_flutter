@@ -1,64 +1,37 @@
-import React, { useEffect } from "react";
+import { useEffect, useRef, useState } from "react"
+import { setBaseUri, createScriptTag, deleteScriptTag } from "../utils/dom"
 
-const createScriptTag = (url) => {
-  const scriptTag = document.createElement("script");
-  scriptTag.type = "application/javascript";
-  scriptTag.src = url;
-
-  const regex = /\/([^/]+)\.js$/;
-  const match = url.match(regex);
-  const result = match[1].replace('.', '_')
-  scriptTag.setAttribute(result, "");
-  document.body.append(scriptTag);
-  return result;
-};
-
-const deleteScriptTag = (tag) => {
-    const scriptTags = document.querySelectorAll(`script[${tag}]`);
-    scriptTags.forEach((scriptTag) => {
-      scriptTag.remove();
-    }); 
-}
-
-export const loader = (entrypointUrl, onEntrypointLoaded, baseUri) => {
-    let baseElement = document.querySelector("base");
-    if (!baseElement) {
-      baseElement = document.createElement("base");
-      document.head.appendChild(baseElement);
-    }
-    baseElement.href = baseUri;
-
-    window._flutter = {
-      loader: {
-        didCreateEngineInitializer: (engine) => onEntrypointLoaded(engine),
-      },
-    };
-    const scriptTag = createScriptTag(entrypointUrl);
-
-    const element = document.createElement("div")
-}
-
-
-const useFlutter = ({ entrypointUrl, onEntrypointLoaded, baseUri }) => {
+const useFlutter = ({ baseUri, assetBase }) => {
+  const flutterTarget = useRef(null)
   useEffect(() => {
-    console.log(baseUri)
-    let baseElement = document.querySelector("base");
-    if (!baseElement) {
-      baseElement = document.createElement("base");
-      document.head.appendChild(baseElement);
+    let scriptTag
+    if (!window._flutter) {
+      const assetBaseNormalized = "/" + assetBase + "/"
+      const entrypointUrl = assetBaseNormalized + "main.dart.js"
+      setBaseUri(baseUri)
+      const didCreateEngineInitializer = async (engineInitializer) => {
+        let appRunner = await engineInitializer.initializeEngine({
+          hostElement: flutterTarget.current,
+          assetBase: assetBaseNormalized,
+        })
+        await appRunner.runApp()
+      }
+      window._flutter = { loader: { didCreateEngineInitializer } }
+      scriptTag = createScriptTag(entrypointUrl)
     }
-    baseElement.href = baseUri;
-
-    window._flutter = {
-      loader: {
-        didCreateEngineInitializer: (engine) => onEntrypointLoaded(engine),
-      },
-    };
-    const scriptTag = createScriptTag(entrypointUrl);
-    setTimeout(() => deleteScriptTag(scriptTag), 2000);
-  }, [baseUri, entrypointUrl, onEntrypointLoaded]);
-
-  return null;
-};
-
-export default useFlutter;
+    return () => deleteScriptTag(scriptTag)
+  }, [baseUri, flutterTarget, assetBase])
+  const [flutterState, setFlutterState] = useState(null)
+  useEffect(() => {
+    console.log("rerender")
+    if (flutterTarget.current) {
+      const setState = (event) => {
+        setFlutterState(event.detail)
+        flutterTarget.current.removeEventListener("flutter-initialized", setState)
+      }
+      flutterTarget.current.addEventListener("flutter-initialized", setState)
+    }
+  }, [flutterTarget])
+  return { flutterTarget, flutterState }
+}
+export default useFlutter
