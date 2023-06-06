@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { createPortal } from "react-dom"
 import { Await, useLoaderData } from "react-router-dom"
 import { setBaseUri, createScriptTag } from "./utils/dom"
@@ -24,22 +24,8 @@ export const loader = async (baseUri, assetBase, entrypointUrl) => {
   })
 }
 export const FlutterComponent = () => {
-  const flutterState = useRef(null)
   const [count, setCount] = useState(0)
-  const { flutterTarget } = useLoaderData()
-  // useEffect(() => {
-  //     if (window._flutter) {
-  //         flutterTarget.current.addEventListener("flutter-initialized", (event)P=> {
-  //             onFlutterAppLoaded(event)
-  //         })`
-  //         console.log(flutterTarget)
-  //     }
-  // }, [assetBase, entrypointUrl])
-  const onFlutterAppLoaded = (event) => {
-    flutterState.current = event.detail
-    setCount(flutterState.current.getClicks())
-    flutterState.current.onClicksChanged(() => setCount(flutterState.current.getClicks()))
-  }
+  const { flutterTarget, flutterState } = useLoaderData()
   return (
     <div
       style={{

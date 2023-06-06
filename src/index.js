@@ -17,7 +17,7 @@ root.render(
         element: (
           <>
             <Link to="/counter2">counter2</Link>
-            <App assetBase={"flutter"} baseUri={"/counter1/"} />
+            <App appDir={"flutter"} baseUri={"/counter1/"} />
           </>
         ),
       },
@@ -25,7 +25,8 @@ root.render(
         path: "/counter2",
         loader: async () => {
           return {
-            flutterTarget: await loader("/counter2/", "/flutter/", "/flutter/main.dart.js")
+            flutterTarget: await loader("/counter2/", "/flutter/", "/flutter/main.dart.js"),
+            flutterState: {},
           }
         },
         element: (

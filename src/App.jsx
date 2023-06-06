@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import useFlutter from "./hooks/useFlutter"
 
-const App = ({ assetBase, baseUri }) => {
+const App = ({ appDir, baseUri }) => {
   const [count, setCount] = useState(0)
-  const { flutterTarget, flutterState } = useFlutter({ baseUri, assetBase })
+  const { flutterTarget, flutterState } = useFlutter({ baseUri, appDir })
   useEffect(() => {
     if (flutterState) {
       setCount(flutterState.getClicks())
