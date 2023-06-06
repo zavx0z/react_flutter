@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { setBaseUri, createScriptTag, deleteScriptTag } from "../utils/dom"
 
-const useFlutter = ({ baseUri, appDir }) => {
+const useFlutter = ({ appDir, baseUri }) => {
   const flutterTarget = useRef(null)
   useEffect(() => {
     let scriptTag
     if (!window._flutter) {
-      const assetBaseNormalized = "/" + appDir + "/"
-      const entrypointUrl = assetBaseNormalized + "main.dart.js"
       setBaseUri(baseUri)
+      const assetBaseNormalized = "/" + appDir + "/"
       const didCreateEngineInitializer = async (engineInitializer) => {
         let appRunner = await engineInitializer.initializeEngine({
           hostElement: flutterTarget.current,
@@ -17,10 +16,13 @@ const useFlutter = ({ baseUri, appDir }) => {
         await appRunner.runApp()
       }
       window._flutter = { loader: { didCreateEngineInitializer } }
+
+      const entrypointUrl = assetBaseNormalized + "main.dart.js"
       scriptTag = createScriptTag(entrypointUrl)
     }
     return () => deleteScriptTag(scriptTag)
-  }, [baseUri, flutterTarget, appDir])
+  }, [flutterTarget, appDir, baseUri])
+
   const [flutterState, setFlutterState] = useState(null)
   useEffect(() => {
     console.log("rerender")

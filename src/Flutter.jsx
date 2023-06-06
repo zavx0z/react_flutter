@@ -1,31 +1,30 @@
 import { useState } from "react"
-import { createPortal } from "react-dom"
-import { Await, useLoaderData } from "react-router-dom"
+import { useLoaderData } from "react-router-dom"
 import { setBaseUri, createScriptTag } from "./utils/dom"
 
 export const loader = async (baseUri, assetBase, entrypointUrl) => {
-  return new Promise((resolve, reject) => {
-    console.log("🚀 ~ file: useFlutter.jsx:24 ~ loader ~ assetBase:", assetBase)
+  console.log(baseUri, assetBase, entrypointUrl)
+  const target =  new Promise((resolve, reject) => {
     setBaseUri(baseUri)
     let flutterTarget = document.getElementById("flutterPortal")
-    // let flutterTarget = document.createElement("div");
-    console.log("🚀 ~ file: useFlutter.jsx:32 ~ loader ~ flutterTarget:", flutterTarget.current)
-    const didCreateEngineInitializer = async (engineInitializer) => {
-      let appRunner = await engineInitializer.initializeEngine({
-        hostElement: flutterTarget,
-        assetBase: assetBase,
-      })
-      await appRunner.runApp()
-      resolve(flutterTarget)
-    }
-    window._flutter = { loader: { didCreateEngineInitializer } }
-    const scriptTag = createScriptTag(entrypointUrl)
-    console.log("🚀 ~ file: useFlutter.jsx:51 ~ loader ~ flutterTarget:", flutterTarget)
+    console.log(flutterTarget)
+    // const didCreateEngineInitializer = async (engineInitializer) => {
+    //   let appRunner = await engineInitializer.initializeEngine({
+    //     hostElement: flutterTarget,
+    //     assetBase: assetBase,
+    //   })
+    //   await appRunner.runApp()
+    //   resolve(flutterTarget)
+    // }
+    // window._flutter = { loader: { didCreateEngineInitializer } }
+    // const scriptTag = createScriptTag(entrypointUrl)
+    // console.log("🚀 ~ file: useFlutter.jsx:51 ~ loader ~ flutterTarget:", flutterTarget)
   })
+  return{flutterTarget: target}
 }
-export const FlutterComponent = () => {
+export const Component = () => {
   const [count, setCount] = useState(0)
-  const { flutterTarget, flutterState } = useLoaderData()
+  // const { flutterTarget, flutterState } = useLoaderData()
   return (
     <div
       style={{
@@ -39,23 +38,8 @@ export const FlutterComponent = () => {
     >
       <div>
         <h1>{count}</h1>
-        <button onClick={() => flutterState.current.setClicks(count + 1)}>+</button>
+        {/* <button onClick={() => flutterState.current.setClicks(count + 1)}>+</button> */}
       </div>
-      <Await resolve={flutterTarget}>
-        {(flutterTarget) => {
-          console.log(flutterTarget)
-          return createPortal(<></>, flutterTarget)
-
-          //   <div
-          //     // ref={flutterTarget}
-          //     style={{
-          //       width: 444,
-          //       height: 444,
-          //       border: "1px solid black",
-          //     }}
-          //   />
-        }}
-      </Await>
     </div>
   )
 }
