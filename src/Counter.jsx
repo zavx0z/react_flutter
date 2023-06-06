@@ -1,25 +1,31 @@
 import { FlutterApp } from "./FlutterApp"
 import { observer } from "mobx-react"
-import { applyPatch, addMiddleware, types } from "mobx-state-tree"
+import { applyPatch, addMiddleware } from "mobx-state-tree"
 
-export const counterModel = types
-  .model({
-    count: types.optional(types.number, 0),
-  })
-  .actions((self) => ({
-    increment() {
-      self.count++
-    },
-    decrement() {
-      self.count--
-    },
-    reset() {
-      self.count = 0
-    },
-    setCount(count) {
-      self.count = count
-    },
-  }))
+export const loader = (everything) => {
+  applyPatch(everything, { path: "/counter", op: "add", value: {} })
+  return null
+}
+export const handle = (everything) => ({
+  confusion: (app) => {
+    applyPatch(everything, { path: "/counter", op: "replace", value: { count: app.getClicks() } })
+    app.onClicksChanged(() =>
+      applyPatch(everything, { path: "/counter", op: "replace", value: { count: app.getClicks() } })
+    )
+    addMiddleware(everything.counter, (call, next) => {
+      switch (call.name) {
+        case "increment":
+          return next(call, () => app.setClicks(call.context.count))
+        case "decrement":
+          return next(call, () => app.setClicks(call.context.count))
+        case "reset":
+          return next(call, () => app.setClicks(call.context.count))
+        default:
+          return next(call)
+      }
+    })
+  },
+})
 
 const RootAppCounter = observer(({ counter }) => <h2>{counter.count}</h2>)
 
@@ -36,7 +42,11 @@ export const Counter = ({ counter }) => {
         gap: 100,
       }}>
       <RootAppCounter counter={counter} />
-      <button onClick={counter.increment}>+</button>
+      <div>
+        <button onClick={counter.decrement}>-</button>
+        <button onClick={counter.reset}>0</button>
+        <button onClick={counter.increment}>+</button>
+      </div>
       <FlutterApp
         appDir={"flutter"}
         style={{
@@ -47,30 +57,4 @@ export const Counter = ({ counter }) => {
       />
     </div>
   )
-}
-
-export const handle = (everything) => ({
-  confusion: (flutterStore) => {
-    applyPatch(everything, { path: "/counter", op: "replace", value: { count: flutterStore.getClicks() } })
-    flutterStore.onClicksChanged(() =>
-      applyPatch(everything, {
-        path: "/counter",
-        op: "replace",
-        value: { count: flutterStore.getClicks() },
-      })
-    )
-    addMiddleware(everything.counter, (call, next) => {
-      switch (call.name) {
-        case "increment":
-          return next(call, () => flutterStore.setClicks(call.context.count))
-        default:
-          return next(call)
-      }
-    })
-  },
-})
-
-export const loader = (everything) => {
-  applyPatch(everything, { path: "/counter", op: "add", value: {} })
-  return null
 }
