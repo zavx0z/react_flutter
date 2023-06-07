@@ -1,9 +1,5 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
-
 import 'package:flutter/material.dart';
-
 import 'pages/counter.dart';
-
 import 'src/js_interop.dart';
 import 'package:url_strategy/url_strategy.dart';
 

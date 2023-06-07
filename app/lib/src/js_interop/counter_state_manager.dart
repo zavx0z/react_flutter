@@ -1,13 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:js/js.dart';
 
-/// This is the bit of state that JS is able to see.
-///
-/// It contains getters/setters/operations and a mechanism to
-/// subscribe to change notifications from an incoming [notifier].
+/// Это бит состояния, который может видеть JS.
+/// Он содержит геттеры/сеттеры/операции и механизм для
+/// подписываемся на уведомления об изменениях от входящего [notifier].
 @JSExport()
 class AppStateManager {
-  // Creates a DemoAppStateManager wrapping a ValueNotifier.
+  // Создает DemoAppStateManager, обертывающий ValueNotifier.
   AppStateManager({ required ValueNotifier<int> counter }) : _counter = counter;
 
   final ValueNotifier<int> _counter;
@@ -29,7 +28,7 @@ class AppStateManager {
     _counter.value--;
   }
 
-  // Allows clients to subscribe to changes to the wrapped value.
+  // Позволяет клиентам подписываться на изменения обернутого значения.
   void onClicksChanged(VoidCallback f) {
     _counter.addListener(f);
   }
