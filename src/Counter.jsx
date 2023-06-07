@@ -29,7 +29,7 @@ export const handle = (everything) => ({
 
 const RootAppCounter = observer(({ counter }) => <h2>{counter.count}</h2>)
 
-export const Counter = ({ counter }) => {
+export const Counter = ({ counter, children }) => {
   return (
     <div
       style={{
@@ -41,6 +41,7 @@ export const Counter = ({ counter }) => {
         alignItems: "center",
         gap: 100,
       }}>
+      {children}
       <RootAppCounter counter={counter} />
       <div>
         <button onClick={counter.decrement}>-</button>
