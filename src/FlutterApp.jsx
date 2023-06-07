@@ -33,12 +33,14 @@ const useFlutter = ({ appDir, baseUri, confusion }) => {
       await appRunner.runApp()
     }
     window._flutter = { loader: { didCreateEngineInitializer } }
-    const setState = (event) => {
-      confusion(event.detail)
-      setLoaded(true)
-      flutterTarget.current.removeEventListener("flutter-initialized", setState)
-    }
-    flutterTarget.current.addEventListener("flutter-initialized", setState)
+    if (confusion) {
+      const setState = (event) => {
+        confusion(event.detail)
+        setLoaded(true)
+        flutterTarget.current.removeEventListener("flutter-initialized", setState)
+      }
+      flutterTarget.current.addEventListener("flutter-initialized", setState)
+    } else setLoaded(true)
     const scriptTag = createScriptTag(`/${appDir}/main.dart.js`)
     return () => {
       document.querySelectorAll(`script[${scriptTag}]`).forEach((tag) => tag.remove())
@@ -51,20 +53,33 @@ const useFlutter = ({ appDir, baseUri, confusion }) => {
   return { flutterTarget, loaded }
 }
 
+const getBaseUri = (match) => {
+  const { params, pathname } = match
+  if (params["*"]) {
+    const base = pathname.replace(params["*"], "")
+    return base.endsWith("/") ? base : base.concat("/")
+  }
+  const baseUri = match.pathname.endsWith("/") ? match.pathname : match.pathname.concat("/")
+  return baseUri
+}
+
 export const FlutterApp = ({ appDir, style = {} }) => {
   const matches = useMatches()
   const match = matches[matches.length - 1]
-  const baseUri = match.pathname.endsWith("/") ? match.pathname : match.pathname.concat("/")
-  const { flutterTarget, loaded } = useFlutter({ baseUri, appDir, confusion: match.handle.confusion })
+  const baseUri = getBaseUri(match)
+  const { flutterTarget, loaded } = useFlutter({ baseUri, appDir, confusion: match.handle?.confusion })
   return (
     <div
       ref={flutterTarget}
       style={{
         ...{ visibility: loaded ? "visible" : "hidden" },
-        height: "100vh",
-        width: "100vw",
+        height: "100%",
+        width: "100%",
+        overscrollBehavior: "contain",
+        overscrollBehaviorY: "contain",
         ...style,
       }}
     />
   )
 }
+export default FlutterApp
